@@ -54,7 +54,7 @@ jobs:
         uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
 
       - name: nub install
-        run: nub i
+        run: nub i --ignore-scripts
 
       - name: Build fonts
         run: nub src/index.ts
