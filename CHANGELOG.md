@@ -1,3 +1,9 @@
+## [0.1.4](https://github.com/adamhl8/font-iosevka/compare/v0.1.3..v0.1.4) - 2026-07-09
+
+### ⚙️ Miscellaneous Tasks
+
+- ignore scripts during nub install ([713f6fe](https://github.com/adamhl8/font-iosevka/commit/713f6fee6ffc8f7eb9d8aa171697ba3f1dac10d8) by @adamhl8)
+
 ## [0.1.3](https://github.com/adamhl8/font-iosevka/compare/v0.1.2..v0.1.3) - 2026-07-09
 
 ### ⚙️ Miscellaneous Tasks
