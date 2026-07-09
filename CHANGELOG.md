@@ -1,3 +1,9 @@
+## [0.1.3](https://github.com/adamhl8/font-iosevka/compare/v0.1.2..v0.1.3) - 2026-07-09
+
+### ⚙️ Miscellaneous Tasks
+
+- install deps in release workflow ([1dccfe4](https://github.com/adamhl8/font-iosevka/commit/1dccfe49f3608864de661152326fec6f89f3224d) by @adamhl8)
+
 ## [0.1.2](https://github.com/adamhl8/font-iosevka/compare/v0.1.1..v0.1.2) - 2026-07-09
 
 ### ⚙️ Miscellaneous Tasks
