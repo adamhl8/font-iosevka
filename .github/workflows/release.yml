@@ -29,7 +29,6 @@ jobs:
   fonts:
     needs: tag
     runs-on: ubuntu-latest
-    timeout-minutes: 120
     permissions:
       contents: write
     env:
@@ -53,6 +52,9 @@ jobs:
 
       - name: Set up uv
         uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+
+      - name: nub install
+        run: nub i
 
       - name: Build fonts
         run: nub src/index.ts
