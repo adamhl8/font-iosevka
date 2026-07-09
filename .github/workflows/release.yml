@@ -52,7 +52,7 @@ jobs:
           sudo apt install -y fontforge ttfautohint
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v8
+        uses: astral-sh/setup-uv@latest
 
       - name: Build fonts
         run: nub src/index.ts
