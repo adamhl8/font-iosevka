@@ -40,10 +40,13 @@ jobs:
         with:
           ref: ${{ needs.tag.outputs.tag }}
 
-      - name: Set up nub
-        uses: nubjs/setup-nub@v0
+      - name: Set up bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: "26"
+          bun-version: canary
+
+      - name: Install just
+        uses: taiki-e/install-action@just
 
       - name: Install font tools
         run: |
@@ -51,13 +54,13 @@ jobs:
           sudo apt install -y fontforge ttfautohint
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@v8.3.2
 
-      - name: nub install
-        run: nub i --ignore-scripts
+      - name: Install dependencies
+        run: bun i --ignore-scripts
 
       - name: Build fonts
-        run: nub src/index.ts
+        run: just build-fonts
 
       - name: Attach TTFs to release
         env:

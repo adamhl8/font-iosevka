@@ -3,7 +3,6 @@ import path from "node:path"
 import process from "node:process"
 
 import { execa, $ } from "execa"
-import { whichCommandSync as which } from "which-command"
 
 const FACES = [
   { suffix: "Regular", weight: 400, style: "normal" },
@@ -31,7 +30,7 @@ const REQUIRED_TOOLS = ["ttfautohint", "fontforge"]
 
 const assertToolsInstalled = () => {
   for (const tool of REQUIRED_TOOLS) {
-    const toolPath = which(tool)
+    const toolPath = Bun.which(tool)
     if (toolPath) continue
 
     console.error(`${tool} is not installed`)
@@ -52,9 +51,9 @@ const downloadFontPatcher = async () => {
 # dependencies = ["argparse"]
 # ///
 `
-  const scriptSrc = await fs.readFile(FONT_PATCHER_SCRIPT, "utf8")
+  const scriptSrc = await Bun.file(FONT_PATCHER_SCRIPT).text()
   const scriptBody = scriptSrc.split("\n").slice(1).join("\n") // remove existing shebang
-  await fs.writeFile(FONT_PATCHER_SCRIPT, `${shebang}${scriptBody}`)
+  await Bun.write(FONT_PATCHER_SCRIPT, `${shebang}${scriptBody}`)
 }
 
 const buildIosevka = async () => {
@@ -64,8 +63,8 @@ const buildIosevka = async () => {
   console.info("Installing deps...")
   await iosevkaExeca`npm install`
 
-  const iosevkaToml = path.join(import.meta.dirname, "iosevka.toml")
-  const iosevkaTerminalToml = path.join(import.meta.dirname, "iosevka-terminal.toml")
+  const iosevkaToml = path.join(import.meta.dir, "iosevka.toml")
+  const iosevkaTerminalToml = path.join(import.meta.dir, "iosevka-terminal.toml")
 
   await iosevkaExeca`cp ${iosevkaToml} ./private-build-plans.toml`
   console.info("Building Iosevka...")
@@ -81,11 +80,11 @@ const buildIosevka = async () => {
 
 const generateNerdFonts = async () => {
   console.info("Generating nerd fonts...")
-  const fontFiles = await Array.fromAsync(fs.glob(`${IN_DIR}/*`))
+  const fontFileNames = await Array.fromAsync(new Bun.Glob("*").scan(IN_DIR))
 
   await Promise.all(
-    fontFiles.map(async (fontFilePath) => {
-      const fontFileName = path.basename(fontFilePath)
+    fontFileNames.map(async (fontFileName) => {
+      const fontFilePath = path.join(IN_DIR, fontFileName)
       console.info(`Processing '${fontFileName}'...`)
       await $`fontforge -script ${FONT_PATCHER_SCRIPT} ${fontFilePath} --quiet --complete -out ${OUT_DIR}`
       console.info(`Finished processing '${fontFileName}'`)
@@ -116,7 +115,7 @@ const generateWebFonts = async () => {
     }),
   )
 
-  await fs.writeFile("./index.css", `${FACES.map(cssRule).join("\n\n")}\n`)
+  await Bun.write("./index.css", `${FACES.map(cssRule).join("\n\n")}\n`)
   console.info("Wrote ./index.css and ./web/")
 }
 
