@@ -1,3 +1,11 @@
+## [0.1.5](https://github.com/adamhl8/font-iosevka/compare/v0.1.4..v0.1.5) - 2026-07-12
+
+### ⚙️ Miscellaneous Tasks
+
+- simplify release process ([5ce196c](https://github.com/adamhl8/font-iosevka/commit/5ce196c2cc166b083f4f587ed3c59a74beae8f59) by @adamhl8)
+
+- cleanup project ([3fa20fc](https://github.com/adamhl8/font-iosevka/commit/3fa20fc9d7cfd2ca22715c6a8c9dce01532ce179) by @adamhl8)
+
 ## [0.1.4](https://github.com/adamhl8/font-iosevka/compare/v0.1.3..v0.1.4) - 2026-07-09
 
 ### ⚙️ Miscellaneous Tasks
