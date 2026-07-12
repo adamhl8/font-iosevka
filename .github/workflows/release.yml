@@ -9,60 +9,8 @@ jobs:
       contents: write
     uses: adamhl8/configs/.github/workflows/release.yml@main
     secrets: inherit
-
-  tag:
-    needs: release
-    runs-on: ubuntu-latest
-    outputs:
-      tag: ${{ steps.tag.outputs.tag }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          ref: main
-          fetch-depth: 0
-
-      - name: Get release tag
-        id: tag
-        run: echo "tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
-
-  fonts:
-    needs: tag
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    env:
-      TAG: ${{ needs.tag.outputs.tag }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ needs.tag.outputs.tag }}
-
-      - name: Set up bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: canary
-
-      - name: Install just
-        uses: taiki-e/install-action@just
-
-      - name: Install font tools
-        run: |
-          sudo apt update
-          sudo apt install -y fontforge ttfautohint
-
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v8.3.2
-
-      - name: Install dependencies
-        run: bun i --ignore-scripts
-
-      - name: Build fonts
-        run: just build-fonts
-
-      - name: Attach TTFs to release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${TAG}" ./out/*.ttf --clobber
+    with:
+      setup: |
+        sudo apt update
+        sudo apt install -y fontforge ttfautohint
+        curl -LsSf https://astral.sh/uv/install.sh | sh
