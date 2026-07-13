@@ -8,9 +8,9 @@ jobs:
     permissions:
       contents: write
     uses: adamhl8/configs/.github/workflows/release.yml@main
-    secrets: inherit
     with:
       setup: |
         sudo apt update
         sudo apt install -y fontforge ttfautohint
         curl -LsSf https://astral.sh/uv/install.sh | sh
+    secrets: inherit

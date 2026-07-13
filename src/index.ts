@@ -2,6 +2,7 @@ import fs from "node:fs/promises"
 import path from "node:path"
 import process from "node:process"
 
+import bun, { Glob, which } from "bun"
 import { execa, $ } from "execa"
 
 const FACES = [
@@ -30,7 +31,7 @@ const REQUIRED_TOOLS = ["ttfautohint", "fontforge"]
 
 const assertToolsInstalled = () => {
   for (const tool of REQUIRED_TOOLS) {
-    const toolPath = Bun.which(tool)
+    const toolPath = which(tool)
     if (toolPath) continue
 
     console.error(`${tool} is not installed`)
@@ -43,7 +44,7 @@ const downloadFontPatcher = async () => {
   const zipPath = "./font-patcher.zip"
   await $`curl -fsSLo ${zipPath} https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FontPatcher.zip`
   await $`unzip ${zipPath} -d ${FONT_PATCHER_DIR}`
-  await $`rm ${zipPath}`
+  await fs.rm(zipPath)
 
   // rewrite the shebang so uv supplies the script's Python environment
   const shebang = `#!/usr/bin/env -S uv run --script
@@ -51,9 +52,9 @@ const downloadFontPatcher = async () => {
 # dependencies = ["argparse"]
 # ///
 `
-  const scriptSrc = await Bun.file(FONT_PATCHER_SCRIPT).text()
+  const scriptSrc = await bun.file(FONT_PATCHER_SCRIPT).text()
   const scriptBody = scriptSrc.split("\n").slice(1).join("\n") // remove existing shebang
-  await Bun.write(FONT_PATCHER_SCRIPT, `${shebang}${scriptBody}`)
+  await bun.write(FONT_PATCHER_SCRIPT, `${shebang}${scriptBody}`)
 }
 
 const buildIosevka = async () => {
@@ -63,14 +64,15 @@ const buildIosevka = async () => {
   console.info("Installing deps...")
   await iosevkaExeca`npm install`
 
-  const iosevkaToml = path.join(import.meta.dir, "iosevka.toml")
-  const iosevkaTerminalToml = path.join(import.meta.dir, "iosevka-terminal.toml")
+  const buildPlans = path.join(IOSEVKA_DIR, "private-build-plans.toml")
+  const iosevkaToml = bun.file(path.join(import.meta.dir, "iosevka.toml"))
+  const iosevkaTerminalToml = bun.file(path.join(import.meta.dir, "iosevka-terminal.toml"))
 
-  await iosevkaExeca`cp ${iosevkaToml} ./private-build-plans.toml`
+  await bun.write(buildPlans, iosevkaToml)
   console.info("Building Iosevka...")
   await iosevkaExeca`npm run build -- contents::Iosevka`
 
-  await iosevkaExeca`cp ${iosevkaTerminalToml} ./private-build-plans.toml`
+  await bun.write(buildPlans, iosevkaTerminalToml)
   console.info("Building IosevkaTerminal...")
   await iosevkaExeca`npm run build -- ttf::IosevkaTerminal`
 
@@ -80,7 +82,7 @@ const buildIosevka = async () => {
 
 const generateNerdFonts = async () => {
   console.info("Generating nerd fonts...")
-  const fontFileNames = await Array.fromAsync(new Bun.Glob("*").scan(IN_DIR))
+  const fontFileNames = await Array.fromAsync(new Glob("*").scan(IN_DIR))
 
   await Promise.all(
     fontFileNames.map(async (fontFileName) => {
@@ -111,11 +113,12 @@ const generateWebFonts = async () => {
   await Promise.all(
     FACES.map(async ({ suffix }) => {
       const fileName = `Iosevka-${suffix}.woff2`
-      return fs.copyFile(`${IOSEVKA_DIR}/dist/Iosevka/WOFF2/${fileName}`, `${WEB_DIR}/${fileName}`)
+      const woff2 = bun.file(`${IOSEVKA_DIR}/dist/Iosevka/WOFF2/${fileName}`)
+      await bun.write(`${WEB_DIR}/${fileName}`, woff2)
     }),
   )
 
-  await Bun.write("./index.css", `${FACES.map(cssRule).join("\n\n")}\n`)
+  await bun.write("./index.css", `${FACES.map(cssRule).join("\n\n")}\n`)
   console.info("Wrote ./index.css and ./web/")
 }
 
