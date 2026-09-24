@@ -9,7 +9,7 @@ jobs:
       contents: write
     uses: adamhl8/configs/.github/workflows/release.yml@main
     with:
-      setup: |
+      before-release: |
         sudo apt update
         sudo apt install -y fontforge ttfautohint
         curl -LsSf https://astral.sh/uv/install.sh | sh
