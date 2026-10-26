@@ -12,5 +12,5 @@ jobs:
       before-release: |
         sudo apt update
         sudo apt install -y fontforge ttfautohint
-        curl -LsSf https://astral.sh/uv/install.sh | sh
+        curl --location --silent --show-error --fail https://astral.sh/uv/install.sh | sh
     secrets: inherit

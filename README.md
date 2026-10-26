@@ -53,7 +53,7 @@ The package intentionally has no `exports` map, so font files stay resolvable by
 
 ## Building
 
-The fonts are built by CI on release, so you only need this to regenerate the committed web fonts (after bumping `IOSEVKA_REF` in `src/index.ts`, say).
+The release workflow builds the fonts from the latest Iosevka commit before publishing, so you only need this to try a change locally (to the build plans in `src/`, say).
 
 The following must be available on `PATH`:
 
@@ -65,10 +65,10 @@ The following must be available on `PATH`:
 - `uv`
 
 ```sh
-just build-fonts
+bunx bask build-fonts
 ```
 
-Everything happens in the current working directory: the Iosevka repo is cloned and built there, fonts are patched, and the intermediate directories (`Iosevka/`, `font-patcher/`, `in/`) are cleaned up afterwards. It writes the 8 Nerd Font TTFs to `out/`, and the web fonts to `index.css` and `web/` (both of which are committed, since the npm publish job has no font toolchain).
+Everything happens in the current working directory: the Iosevka repo is cloned and built there, fonts are patched, and the intermediate directories (`Iosevka/`, `font-patcher/`, `in/`) are cleaned up afterwards. It writes the 8 Nerd Font TTFs to `out/`, and the web fonts to `index.css` and `web/`. Those two are committed, and each release regenerates them as part of the release commit.
 
 ## License
 

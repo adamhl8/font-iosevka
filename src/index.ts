@@ -2,8 +2,7 @@ import fs from "node:fs/promises"
 import path from "node:path"
 import process from "node:process"
 
-import bun, { Glob, which } from "bun"
-import { execa, $ } from "execa"
+import bun, { $, Glob, which } from "bun"
 
 const FACES = [
   { suffix: "Regular", weight: 400, style: "normal" },
@@ -25,8 +24,6 @@ const rmAll = async (dirs: string[]) => {
   await Promise.all(dirs.map(async (dir) => fs.rm(dir, { recursive: true, force: true })))
 }
 
-const iosevkaExeca = execa({ cwd: path.resolve(IOSEVKA_DIR) })
-
 const REQUIRED_TOOLS = ["ttfautohint", "fontforge"]
 
 const assertToolsInstalled = () => {
@@ -44,7 +41,7 @@ const downloadFontPatcher = async () => {
   const zipPath = "./font-patcher.zip"
   await $`curl -fsSLo ${zipPath} https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FontPatcher.zip`
   await $`unzip ${zipPath} -d ${FONT_PATCHER_DIR}`
-  await fs.rm(zipPath)
+  await bun.file(zipPath).delete()
 
   // rewrite the shebang so uv supplies the script's Python environment
   const shebang = `#!/usr/bin/env -S uv run --script
@@ -62,7 +59,7 @@ const buildIosevka = async () => {
   await $`git clone --depth 1 https://github.com/be5invis/Iosevka.git ${IOSEVKA_DIR}`
 
   console.info("Installing deps...")
-  await iosevkaExeca`npm install`
+  await $`npm install`.cwd(IOSEVKA_DIR)
 
   const buildPlans = path.join(IOSEVKA_DIR, "private-build-plans.toml")
   const iosevkaToml = bun.file(path.join(import.meta.dir, "iosevka.toml"))
@@ -70,11 +67,11 @@ const buildIosevka = async () => {
 
   await bun.write(buildPlans, iosevkaToml)
   console.info("Building Iosevka...")
-  await iosevkaExeca`npm run build -- contents::Iosevka`
+  await $`npm run build -- contents::Iosevka`.cwd(IOSEVKA_DIR)
 
   await bun.write(buildPlans, iosevkaTerminalToml)
   console.info("Building IosevkaTerminal...")
-  await iosevkaExeca`npm run build -- ttf::IosevkaTerminal`
+  await $`npm run build -- ttf::IosevkaTerminal`.cwd(IOSEVKA_DIR)
 
   await fs.cp(`${IOSEVKA_DIR}/dist/Iosevka/TTF`, IN_DIR, { recursive: true })
   await fs.cp(`${IOSEVKA_DIR}/dist/IosevkaTerminal/TTF`, IN_DIR, { recursive: true })
@@ -101,14 +98,13 @@ const cssRule = ({ suffix, weight, style }: (typeof FACES)[number]) =>
     `  font-style: ${style};`,
     `  font-weight: ${weight};`,
     "  font-display: swap;",
-    `  src: url('${WEB_DIR}/Iosevka-${suffix}.woff2') format('woff2');`,
+    `  src: url("${WEB_DIR}/Iosevka-${suffix}.woff2") format("woff2");`,
     "}",
   ].join("\n")
 
 const generateWebFonts = async () => {
   console.info("Generating web fonts...")
   await rmAll([WEB_DIR])
-  await fs.mkdir(WEB_DIR, { recursive: true })
 
   await Promise.all(
     FACES.map(async ({ suffix }) => {
