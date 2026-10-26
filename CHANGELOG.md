@@ -1,3 +1,13 @@
+## [0.1.6](https://github.com/adamhl8/font-iosevka/compare/v0.1.5..v0.1.6) - 2026-10-26
+
+### ⚙️ Miscellaneous Tasks
+
+- _(deps)_ update dependencies ([c540c55](https://github.com/adamhl8/font-iosevka/commit/c540c55cfdc5735527e1252f3d10ca226aa9c1d4) by @adamhl8)
+
+- _(deps)_ update dependencies ([c3310a4](https://github.com/adamhl8/font-iosevka/commit/c3310a4a6403b0ea7b6a88fce1d1339819204a26) by @adamhl8)
+
+- _(deps)_ update dependencies ([3dd6a84](https://github.com/adamhl8/font-iosevka/commit/3dd6a8462a7ee6c3e960f81712ed4ade4539eb24) by @adamhl8)
+
 ## [0.1.5](https://github.com/adamhl8/font-iosevka/compare/v0.1.4..v0.1.5) - 2026-07-12
 
 ### ⚙️ Miscellaneous Tasks
